@@ -2,5 +2,3 @@
 #
 # Please refer to the documentation for information on how to create and manage
 # your spiders.
-import win_unicode_console
-win_unicode_console.enable()
