@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from bs4 import BeautifulSoup
-from bs4 import NavigableString
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import time
@@ -152,10 +151,9 @@ class PttCrawler(scrapy.Spider):
 
     def parse_content(self, content):
         div_content = content.select('div#main-content')[0]
-        str = [tmp for tmp in div_content.contents if isinstance(tmp, NavigableString)][0]
-        # str = None
-        # for tmp in div_content.contents:
-        #     if isinstance(tmp, NavigableString):
-        #         str = tmp
-        #         break
-        return str
+        import re
+        [x.extract() for x in div_content.findAll('div', {'class': re.compile('^article-metaline')})]
+        [x.extract() for x in div_content.findAll('div', {'class': 'push'})]
+        [x.extract() for x in div_content.findAll('span', {'class': 'f2'}) if u'文章網址' in x.text or u'發信站' in x.text]
+
+        return div_content.text
