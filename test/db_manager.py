@@ -31,3 +31,9 @@ class Post(Base):
         self.is_reply = argd.get('is_reply', '')
         self.time = argd.get('time', '')
         self.content = argd.get('content', '')
+
+    def __str__(self):
+        return unicode(self).encode('utf-8')
+
+    def __unicode__(self):
+        return u'%s [%s] %s' % (self.push_num, self.category, self.title)

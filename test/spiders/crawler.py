@@ -2,12 +2,11 @@
 import scrapy
 from bs4 import BeautifulSoup
 from bs4 import NavigableString
-from test.items import Post
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import time
 import os
-from test import db_manager
+from test.db_manager import Post
 from sqlalchemy import exists
 import datetime
 
@@ -37,30 +36,30 @@ class PttCrawler(scrapy.Spider):
                 continue
 
             post = Post()
-            post['author'] = author
-            post['push_num'] = self.parse_push_num(post_content)
-            post['mark'] = self.parse_mark(post_content)
+            post.author = author
+            post.push_num = self.parse_push_num(post_content)
+            post.mark = self.parse_mark(post_content)
             full_title = self.parse_full_title(post_content)
-            post['category'] = self.parse_category(full_title)
-            post['title'] = self.parse_title(full_title)
-            post['is_reply'] = self.parse_is_reply(full_title)
-            post['url'] = self.parse_url(post_content)
-            post['post_id'] = self.parse_post_id(post['url'])
-            db_post = db_manager.Post(**post)
-            if post['url']:
-                self.dic_post[post['post_id']] = post
+            post.category = self.parse_category(full_title)
+            post.title = self.parse_title(full_title)
+            post.is_reply = self.parse_is_reply(full_title)
+            post.url = self.parse_url(post_content)
+            post.post_id = self.parse_post_id(post.url)
+            if post.url:
+                self.dic_post[post.post_id] = post
                 time.sleep(0.1)
-                yield scrapy.Request(post['url'], self.parse_post_detail, meta={'post_id': post['post_id'],
-                                                                                'author': post['author'],
-                                                                                'db_row': db_post})
+                yield scrapy.Request(post.url, self.parse_post_detail, meta={'post_id': post.post_id,
+                                                                             'author': post.author,
+                                                                             'db_row': post})
             print post
 
             is_post_exist_in_db = self.db_session.query(
-                exists().where(db_manager.Post.post_id == post['post_id'])).scalar()
+                exists().where(Post.post_id == post.post_id)).scalar()
             if is_post_exist_in_db:
-                pass
+                self.db_session.query().filter(Post == post.post_id) \
+                    .update({Post.push_num: post.push_num})
             else:
-                self.db_session.add(db_post)
+                self.db_session.add(post)
             # self.db_session.add(db_post)
             self.db_session.commit()
 
@@ -79,10 +78,11 @@ class PttCrawler(scrapy.Spider):
             time = self.parse_time(res)
             content = self.parse_content(res)
             is_post_exist_in_db = self.db_session.query(
-                exists().where(db_manager.Post.post_id == post_id)).scalar()
+                exists().where(Post.post_id == post_id)).scalar()
             if is_post_exist_in_db:
                 db_post = response.meta['db_row']
                 db_post.time = time
+                db_post.content = content
                 self.db_session.commit()
             del self.dic_post[post_id]
 
