@@ -3,3 +3,6 @@
 
 # Compiled file
 *.pyc
+
+# DB
+*.db*
