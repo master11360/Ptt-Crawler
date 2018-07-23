@@ -16,6 +16,7 @@ class Post(Base):
     mark = Column(String)
     url = Column(String)
     is_reply = Column(Integer)
+    is_forward = Column(Integer)
     time = Column(String)
     content = Column(String)
 
@@ -28,7 +29,8 @@ class Post(Base):
         self.push_num = argd.get('push_num', '')
         self.mark = argd.get('mark', '')
         self.url = argd.get('url', '')
-        self.is_reply = argd.get('is_reply', '')
+        self.is_reply = argd.get('is_reply', False)
+        self.is_forward = argd.get('is_forward', False)
         self.time = argd.get('time', '')
         self.content = argd.get('content', '')
 
