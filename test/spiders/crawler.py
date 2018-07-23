@@ -42,6 +42,7 @@ class PttCrawler(scrapy.Spider):
             post.category = self.parse_category(full_title)
             post.title = self.parse_title(full_title)
             post.is_reply = self.parse_is_reply(full_title)
+            post.is_forward = self.parse_is_forward(full_title)
             post.url = self.parse_url(post_content)
             post.post_id = self.parse_post_id(post.url)
             if post.url:
@@ -102,7 +103,7 @@ class PttCrawler(scrapy.Spider):
     def parse_category(self, full_title):
         try:
             tmp = full_title.split(']')
-            return tmp[0].replace('[', '').replace('Re:', '').strip()
+            return tmp[0].replace('[', '').replace('Re:', '').replace('Fw:', '').strip()
         # TODO: raise exception
         except:
             return ''
@@ -117,6 +118,9 @@ class PttCrawler(scrapy.Spider):
 
     def parse_is_reply(self, full_title):
         return full_title.startswith('Re:')
+
+    def parse_is_forward(self, full_title):
+        return full_title.startswith('Fw:')
 
     def parse_url(self, content):
         a_title = content.select('.title > a')
