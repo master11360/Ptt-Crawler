@@ -21,7 +21,7 @@ class PttCrawler(scrapy.Spider):
     def __init__(self):
         super(PttCrawler, self).__init__()
         self.dic_post = {}
-        self.db = create_engine('sqlite:///%s' % '../ptt.db')
+        self.db = create_engine('sqlite:///%s' % '../ptt.db', echo=False)
         session_maker = sessionmaker(bind=self.db)
         self.db_session = session_maker()
 
@@ -52,14 +52,11 @@ class PttCrawler(scrapy.Spider):
                                                                              'db_row': post})
             print post
 
-            is_post_exist_in_db = self.db_session.query(
-                exists().where(Post.post_id == post.post_id)).scalar()
+            is_post_exist_in_db = self.db_session.query(exists().where(Post.post_id == post.post_id)).scalar()
             if is_post_exist_in_db:
-                self.db_session.query().filter(Post == post.post_id) \
-                    .update({Post.push_num: post.push_num})
+                self.db_session.query(Post).filter(Post.post_id == post.post_id).update({Post.push_num: post.push_num})
             else:
                 self.db_session.add(post)
-            # self.db_session.add(db_post)
             self.db_session.commit()
 
         # previous page
@@ -76,8 +73,7 @@ class PttCrawler(scrapy.Spider):
             author_nickname = self.parse_author_nickname(res, response.meta['author'])
             time = self.parse_time(res)
             content = self.parse_content(res)
-            is_post_exist_in_db = self.db_session.query(
-                exists().where(Post.post_id == post_id)).scalar()
+            is_post_exist_in_db = self.db_session.query(exists().where(Post.post_id == post_id)).scalar()
             if is_post_exist_in_db:
                 db_post = response.meta['db_row']
                 db_post.time = time
