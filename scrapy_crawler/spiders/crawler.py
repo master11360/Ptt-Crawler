@@ -13,6 +13,8 @@ PTT_DOMAIN = 'https://www.ptt.cc'
 PTT_MOVIE_BOARD = PTT_DOMAIN + '/bbs/movie/index.html'
 CATEGORY_ANNOUNCEMENT = u'公告'
 
+DB_PATH = os.path.join(os.getcwd(), 'ptt.db')
+
 
 class PttCrawler(scrapy.Spider):
     name = 'ptt_movie'
@@ -21,7 +23,7 @@ class PttCrawler(scrapy.Spider):
     def __init__(self):
         super(PttCrawler, self).__init__()
         self.dic_post = {}
-        self.db = create_engine('sqlite:///%s' % '../ptt.db', echo=False)
+        self.db = create_engine('sqlite:///%s' % DB_PATH, echo=False)
         session_maker = sessionmaker(bind=self.db)
         self.db_session = session_maker()
 
