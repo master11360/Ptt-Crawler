@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import time
 import os
-from test.db_manager import Post
+from scrapy_crawler.db_manager import Post
 from sqlalchemy import exists
 import datetime
 

@@ -5,7 +5,7 @@ def main(crawler_name):
 
 if __name__ == '__main__':
     import win_unicode_console
-    from test.spiders.crawler import PttCrawler
+    from scrapy_crawler.spiders.crawler import PttCrawler
 
     win_unicode_console.enable()
     main(PttCrawler.name)
